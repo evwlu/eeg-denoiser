@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 class Autoencoder(nn.Module):
@@ -9,13 +8,17 @@ class Autoencoder(nn.Module):
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 300),
             nn.ReLU(),
-            nn.Linear(300, 100),
+            nn.Linear(300, 200),
+            nn.ReLU(),
+            nn.Linear(200, 100),
             nn.ReLU()
         )
         
         # Decoder layers
         self.decoder = nn.Sequential(
-            nn.Linear(100, 300),
+            nn.Linear(100, 200),
+            nn.ReLU(),
+            nn.Linear(200, 300),
             nn.ReLU(),
             nn.Linear(300, input_dim)
         )

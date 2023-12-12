@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
+import pywt
 from scipy import signal
 from collections import Counter, OrderedDict
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 
 '''
 Preprocessing function for the MindWave dataset, which records EEG signals
@@ -71,11 +72,13 @@ def returnEventDistribution(data_type='MU'):
 Preprocessing function. Allows for some preliminary preprocessing techniques
 as described in the paper Mahapatra et al. (2023). These include:
     - Butterworth high-pass filter (0.5 Hz)
-    - Downsampling (128 Hz)
+    - Normalizing the data using mean and standard deviation
+    - Scaling inputs to range [0, 1]
 '''
 def preprocessInputs(data):
     data = butter_highpass_filter_multi(data, 0.5, 128, order=5)
-    data = normalize(data)
+    data = DWT_transform(data)
+    # data = normalize_scale(data)
     return data
 
 ### Butterpass filter. Taken from https://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
@@ -95,6 +98,14 @@ def butter_highpass_filter_multi(data, cutoff, fs, order=5):
 
     return filtered_signals
 
+def DWT_transform(data):
+    coefficients = pywt.wavedec(data, 'db4', mode='sym', level=3)
+    coefficients_thresholded = [pywt.threshold(c, 0.1, mode='soft') for c in coefficients]
+    eeg_preprocessed = pywt.waverec(coefficients_thresholded, 'db4', mode='sym')
+    return eeg_preprocessed
+
 ### Normalize data using mean and standard deviation.
-def normalize(data):
-    return (data - np.mean(data)) / np.std(data)
+def normalize_scale(data):
+    data = (data - np.mean(data)) / np.std(data)
+    scaler = MinMaxScaler()
+    return scaler.fit_transform(data)
