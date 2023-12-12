@@ -78,7 +78,7 @@ as described in the paper Mahapatra et al. (2023). These include:
 def preprocessInputs(data):
     data = butter_highpass_filter_multi(data, 0.5, 128, order=5)
     data = DWT_transform(data)
-    # data = normalize_scale(data)
+    data = normalize_scale(data)
     return data
 
 ### Butterpass filter. Taken from https://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
