@@ -72,13 +72,14 @@ def returnEventDistribution(data_type='MU'):
 Preprocessing function. Allows for some preliminary preprocessing techniques
 as described in the paper Mahapatra et al. (2023). These include:
     - Butterworth high-pass filter (0.5 Hz)
+    - Applying the DWT coefficient decomposition with 3 layers
     - Normalizing the data using mean and standard deviation
     - Scaling inputs to range [0, 1]
 '''
 def preprocessInputs(data):
     data = butter_highpass_filter_multi(data, 0.5, 128, order=5)
     data = DWT_transform(data)
-    data = normalize_scale(data)
+    # data = normalize_scale(data)
     return data
 
 ### Butterpass filter. Taken from https://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
@@ -106,6 +107,6 @@ def DWT_transform(data):
 
 ### Normalize data using mean and standard deviation.
 def normalize_scale(data):
-    data = (data - np.mean(data)) / np.std(data)
+    # data = (data - np.mean(data)) / np.std(data)
     scaler = MinMaxScaler()
     return scaler.fit_transform(data)
