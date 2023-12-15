@@ -7,30 +7,30 @@ class Autoencoder(nn.Module):
         
         # Encoder layers
         self.encoder = nn.Sequential(
-            nn.Conv1d(1, 2, kernel_size=3, stride=2, padding=1),
-            nn.AvgPool1d(kernel_size=2, stride=2, padding=0),
+            nn.Conv1d(1, 2, kernel_size=3, padding=1),
+            nn.AvgPool1d(kernel_size=2, padding=0),
+            nn.Dropout(0.2),
             nn.ReLU(),
-            nn.Conv1d(2, 4, kernel_size=3, stride=2, padding=1),
+            nn.Conv1d(2, 4, kernel_size=3, padding=1),
+            nn.Dropout(0.2),
             nn.ReLU(),
-            nn.Conv1d(4, 1, kernel_size=3, padding=1),
+            nn.Conv1d(4, 4, kernel_size=3, padding=1),
             nn.ReLU()
         )
         
         # Decoder layers
         self.decoder = nn.Sequential(
-            nn.ConvTranspose1d(1, 3, kernel_size=3, stride=2, padding=1),
+            nn.ConvTranspose1d(4, 4, kernel_size=3, stride=2, padding=1),
+            nn.Dropout(0.2),
             nn.ReLU(),
-            nn.ConvTranspose1d(3, 4, kernel_size=3, stride=2, padding=1),
+            nn.ConvTranspose1d(4, 2, kernel_size=3, stride=1, padding=1),
+            nn.Dropout(0.2),
             nn.ReLU(),
-            nn.ConvTranspose1d(4, 1, kernel_size=4, stride=2, padding=0),
-            # nn.Sigmoid()
+            nn.ConvTranspose1d(2, 1, kernel_size=2, padding=0)
         )
         
     def forward(self, x):
         x = torch.unsqueeze(x, dim=1)
-        # print(x.shape)
         encoded = self.encoder(x)
-        # print(encoded.shape)
         decoded = self.decoder(encoded)
-        # print(decoded.shape)
         return decoded
