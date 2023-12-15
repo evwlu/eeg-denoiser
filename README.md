@@ -32,11 +32,11 @@ Ensure Python 3.6+ is installed on your system. Dependencies are managed on a pe
 
 1. Clone this repository:
    ```
-   git clone https://github.com/your-repo/EEG-Denoising.git
+   git clone https://github.com/your-repo/eeg-denoiser.git
    ```
 2. Navigate to the cloned directory:
    ```
-   cd EEG-Denoising
+   cd eeg-denoiser
    ```
 
 ### Data Preparation
