@@ -89,6 +89,14 @@ def load_fixedSize(signal_size=476, data_type="MU"):
 
 
 """
+Linearly scales inputs to range [0, 1].
+"""
+def scaleInputs(inputs):
+    scaler = MinMaxScaler()
+    return scaler.fit_transform(inputs)
+
+
+"""
 Preprocessing function for the MindWave dataset, which records EEG signals
 when viewing images of digits 0-9. The dataset also includes images of
 non-digits, which are labeled as -1.
