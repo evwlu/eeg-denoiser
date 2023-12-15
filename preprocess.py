@@ -54,7 +54,6 @@ def load_fixedSize(signal_size=476, data_type='MU'):
 
     return inputs, labels_onehot, labels
 
-
 '''
 Preprocessing function for the MindWave dataset, which records EEG signals
 when viewing images of digits 0-9. The dataset also includes images of
@@ -66,7 +65,6 @@ def returnEventDistribution(data_type='MU'):
     data = df.to_numpy()
     isolated_events = data[:, -2]
     return OrderedDict(sorted(Counter(isolated_events).items(), key=lambda t: t[1], reverse=True))
-
 
 '''
 Preprocessing function. Allows for some preliminary preprocessing techniques
@@ -82,7 +80,9 @@ def preprocessInputs(data):
     # data = normalize_scale(data)
     return data
 
-### Butterpass filter. Taken from https://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
+'''
+Butterpass filter. Taken from https://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
+'''
 def butter_highpass_filter_multi(data, cutoff, fs, order=5):
     def butter_highpass(cutoff, fs, order=5):
         nyq = 0.5 * fs
@@ -99,13 +99,18 @@ def butter_highpass_filter_multi(data, cutoff, fs, order=5):
 
     return filtered_signals
 
+'''
+DWT transform. Decomposes the signal into 3 layers of coefficients.
+'''
 def DWT_transform(data):
     coefficients = pywt.wavedec(data, 'db4', mode='sym', level=3)
     coefficients_thresholded = [pywt.threshold(c, 0.1, mode='soft') for c in coefficients]
     eeg_preprocessed = pywt.waverec(coefficients_thresholded, 'db4', mode='sym')
     return eeg_preprocessed
 
-### Normalize data using mean and standard deviation.
+'''
+Normalize data using mean and standard deviation.
+'''
 def normalize_scale(data):
     # data = (data - np.mean(data)) / np.std(data)
     scaler = MinMaxScaler()
