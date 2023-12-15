@@ -71,7 +71,7 @@ Preprocessing function. Allows for some preliminary preprocessing techniques
 as described in the paper Mahapatra et al. (2023). These include:
     - Butterworth high-pass filter (0.5 Hz)
     - Applying the DWT coefficient decomposition with 3 layers
-    - Normalizing the data using mean and standard deviation
+        - Normalizing the data using mean and standard deviation [this step has been removed. the results are MUCH better without it.]
     - Scaling inputs to range [0, 1]
 '''
 def preprocessInputs(data):
