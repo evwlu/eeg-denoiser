@@ -21,7 +21,6 @@ def getData(data_type="MU"):
     # 1: EEG Signal Size
     # 2: EEG Signal Frequency (list of size EEG Signal Size)
     data = data[:, 4:]
-    print(f"Intial data shape: {data.shape}")
 
     return data
 
@@ -163,9 +162,3 @@ def normalize_scale(data):
     # data = (data - np.mean(data)) / np.std(data)
     scaler = MinMaxScaler()
     return scaler.fit_transform(data)
-
-
-if __name__ == "__main__":
-    eventDistribution = returnEventDistribution()
-    print(eventDistribution)
-    load_autoSize()

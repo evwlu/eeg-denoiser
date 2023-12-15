@@ -2,50 +2,60 @@ import torch
 import torch.nn as nn
 
 class CVAE(nn.Module):
-    def __init__(self, input_dim, hidden_dim, latent_dim, num_classes):
+    def __init__(self, feature_size=476, latent_size=2, num_classes=10):
         super(CVAE, self).__init__()
-        self.latent_dim = latent_dim
-        self.num_classes = num_classes
-
+        
+        # Encoder layers
         self.encoder = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
+            nn.Conv1d(1, 2, kernel_size=3, padding=1),
+            nn.AvgPool1d(kernel_size=2, padding=0),
             nn.Dropout(0.2),
             nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim),
+            nn.Conv1d(2, 4, kernel_size=3, padding=1),
             nn.Dropout(0.2),
             nn.ReLU(),
-            nn.Linear(hidden_dim, 2 * latent_dim)  # Output mean and logvar
+            nn.Conv1d(4, 4, kernel_size=3, padding=1),
+            nn.ReLU()
         )
-
+        
+        # Latent space layers
+        self.fc_mean = nn.Linear(feature_size * 2 + num_classes, latent_size)
+        self.fc_logvar = nn.Linear(feature_size * 2 + num_classes, latent_size)
+        
+        # Decoder layers
         self.decoder = nn.Sequential(
-            nn.Linear(latent_dim + num_classes, hidden_dim),
+            nn.ConvTranspose1d(2 + num_classes, 4, kernel_size=3, stride=2, padding=1),
             nn.Dropout(0.2),
             nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim),
+            nn.ConvTranspose1d(4, 2, kernel_size=3, stride=1, padding=1),
             nn.Dropout(0.2),
             nn.ReLU(),
-            nn.Linear(hidden_dim, input_dim),
-            nn.Sigmoid()  # Output reconstructed input
+            nn.ConvTranspose1d(2, 1, kernel_size=2, padding=0)
         )
-
-    def encode(self, x):
+        
+    def encode(self, x, y):
+        x = torch.unsqueeze(x, dim=1)
         encoded = self.encoder(x)
-        mean = encoded[:, :self.latent_dim]
-        logvar = encoded[:, self.latent_dim:]
+        encoded = encoded.view(encoded.size(0), -1)
+        encoded = torch.cat((encoded, y), dim=1)
+        mean = self.fc_mean(encoded)
+        logvar = self.fc_logvar(encoded)
         return mean, logvar
-
+    
     def reparameterize(self, mean, logvar):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         z = mean + eps * std
         return z
-
-    def decode(self, z):
+    
+    def decode(self, z, y):
+        z = z.view(z.size(0), -1, 1)
+        z = torch.cat((z, y), dim=1)
         decoded = self.decoder(z)
         return decoded
-
+    
     def forward(self, x, y):
-        mean, logvar = self.encode(x)
+        mean, logvar = self.encode(x, y)
         z = self.reparameterize(mean, logvar)
-        output = self.decode(z)
-        return output
+        decoded = self.decode(z, y)
+        return decoded
