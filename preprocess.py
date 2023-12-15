@@ -10,7 +10,7 @@ Preprocessing function for the MindWave dataset, which records EEG signals
 when viewing images of digits 0-9. The dataset also includes images of
 non-digits, which are labeled as -1.
 '''
-def load_fixedSize(signal_size=952, data_type='MU'):
+def load_fixedSize(signal_size=476, data_type='MU'):
     # Read the file
     print(f"Preprocessing {data_type} dataset...")
     file_path = f"data/{data_type}.txt"
