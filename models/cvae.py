@@ -9,16 +9,20 @@ class CVAE(nn.Module):
 
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
+            nn.Dropout(0.2),
             nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
+            nn.Dropout(0.2),
             nn.ReLU(),
             nn.Linear(hidden_dim, 2 * latent_dim)  # Output mean and logvar
         )
 
         self.decoder = nn.Sequential(
             nn.Linear(latent_dim + num_classes, hidden_dim),
+            nn.Dropout(0.2),
             nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
+            nn.Dropout(0.2),
             nn.ReLU(),
             nn.Linear(hidden_dim, input_dim),
             nn.Sigmoid()  # Output reconstructed input
